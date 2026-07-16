@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.IO;
 using System.Net.Http;
 using System.Security.Cryptography;
@@ -249,7 +249,11 @@ public static class ModProfile
             {
             }
 
-            ModBase.Log(ex, Lang.Text("Launch.Account.Profile.Error.Corrupted"), ModBase.LogLevel.Msgbox);
+            ModBase.Log(
+                ex,
+                Lang.Text("Launch.Account.Profile.Error.Corrupted"),
+                ModBase.LogLevel.Msgbox,
+                userSummary: Lang.Text("Launch.Account.Profile.Error.Corrupted"));
         }
     }
 
@@ -318,7 +322,11 @@ public static class ModProfile
         }
         catch (Exception ex)
         {
-            ModBase.Log(ex, Lang.Text("Launch.Account.Profile.Error.Write"), ModBase.LogLevel.Feedback);
+            ModBase.Log(
+                ex,
+                Lang.Text("Launch.Account.Profile.Error.Write"),
+                ModBase.LogLevel.Feedback,
+                userSummary: Lang.Text("Launch.Account.Profile.Error.Write"));
         }
     }
 
@@ -460,7 +468,15 @@ public static class ModProfile
                     selectedProfile.Username = (string)resultJson["name"];
                     profileList.Add(selectedProfile);
                     lastUsedProfile = profileList.Count - 1;
-                    ModMain.frmLaunchLeft.RefreshPage(true);
+                    // 本方法在后台线程执行（阻塞网络请求），下面操作 WPF 控件，必须切回 UI 线程，
+                    // 否则触发线程亲和性异常——与本文件其他从后台线程刷新界面处一样用 RunInUi 包裹。
+                    ModBase.RunInUi(() =>
+                    {
+                        // 改名成功后正处于档案页(ProfileSkin)，此时 RefreshPage 因目标页与当前页相同会提前
+                        // 返回、不刷新显示的玩家 ID，需显式 Reload 当前档案页，使新 ID 立即生效。
+                        ModMain.frmLoginProfileSkin?.Reload();
+                        ModMain.frmLaunchLeft.RefreshPage(true);
+                    });
                     SaveProfile();
                 }
                 catch (HttpRequestException ex)
@@ -469,7 +485,11 @@ public static class ModProfile
                     if (exSummary.Contains("403"))
                         ModMain.MyMsgBox(Lang.Text("Launch.Account.Profile.EditPlayerId.Cooldown"), Lang.Text("Launch.Account.Profile.EditPlayerId.Failed.Title"), Lang.Text("Common.Action.Confirm"));
                     else
-                        ModBase.Log(ex, Lang.Text("Launch.Account.Profile.Error.ChangeId"), ModBase.LogLevel.Msgbox);
+                        ModBase.Log(
+                            ex,
+                            Lang.Text("Launch.Account.Profile.Error.ChangeId"),
+                            ModBase.LogLevel.Msgbox,
+                            userSummary: Lang.Text("Launch.Account.Profile.Error.ChangeId"));
                 }
             });
         }
@@ -746,20 +766,20 @@ public static class ModProfile
         // 检查条件，获取新皮肤
         if (_isMsSkinChanging)
         {
-            HintService.Hint("正在更改皮肤中，请稍候！");
+            HintService.Hint(Lang.Text("Launch.Skin.Change.Busy"));
             return;
         }
 
         if (ModLaunch.mcLoginLoader.State == ModBase.LoadState.Failed)
         {
-            HintService.Hint("登录失败，无法更改皮肤！", HintType.Error);
+            HintService.Hint(Lang.Text("Launch.Skin.Change.LoginFailed"), HintType.Error);
             return;
         }
 
         var skinInfo = ModSkin.McSkinSelect();
         if (!skinInfo.IsVaild)
             return;
-        HintService.Hint("正在更改皮肤……");
+        HintService.Hint(Lang.Text("Launch.Skin.Change.Starting"));
         _isMsSkinChanging = true;
         // 开始实际获取
 
@@ -777,7 +797,7 @@ public static class ModProfile
                     ModLaunch.mcLoginMsLoader.WaitForExit(GetLoginData());
                 if (ModLaunch.mcLoginMsLoader.State != ModBase.LoadState.Finished)
                 {
-                    HintService.Hint("登录失败，无法更改皮肤！", HintType.Error);
+                    HintService.Hint(Lang.Text("Launch.Skin.Change.LoginFailed"), HintType.Error);
                     return;
                 }
 
@@ -803,7 +823,7 @@ public static class ModProfile
                     });
                 if (res.Contains("request requires user authentication"))
                 {
-                    HintService.Hint("正在登录，将在登录完成后继续更改皮肤……");
+                    HintService.Hint(Lang.Text("Launch.Skin.Change.Reauthenticating"));
                     ModLaunch.mcLoginMsLoader.Start(GetLoginData(), true);
                     goto Retry;
                 }
@@ -811,7 +831,9 @@ public static class ModProfile
                 if (res.Contains("\"error\""))
                 {
                     HintService.Hint(
-                        $"更改皮肤失败：{((JsonObject)ModBase.GetJson(res))["error"]}",
+                        Lang.Text(
+                            "Launch.Skin.Change.FailedWithDetail",
+                            ((JsonObject)ModBase.GetJson(res))["error"]?.ToString() ?? res),
                         HintType.Error);
                     return;
                 }
@@ -831,9 +853,15 @@ public static class ModProfile
             catch (Exception ex)
             {
                 if (ex.GetType().Equals(typeof(TaskCanceledException)))
-                    HintService.Hint("更改皮肤失败：与 Mojang 皮肤服务器的连接超时，请检查你的网络是否通畅！", HintType.Error);
+                    HintService.Hint(
+                        Lang.Text("Launch.Skin.Change.Timeout.WithDetail", ex.ToString()),
+                        HintType.Error);
                 else
-                    ModBase.Log(ex, Lang.Text("Launch.Account.Profile.Error.ChangeSkin"), ModBase.LogLevel.Hint);
+                    ModBase.Log(
+                        ex,
+                        Lang.Text("Launch.Account.Profile.Error.ChangeSkin"),
+                        ModBase.LogLevel.Hint,
+                        userSummary: Lang.Text("Launch.Account.Profile.Error.ChangeSkin"));
             }
             finally
             {

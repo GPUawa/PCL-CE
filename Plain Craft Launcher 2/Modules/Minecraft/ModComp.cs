@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Concurrent;
 using System.IO;
 using System.IO.Compression;
@@ -645,17 +645,20 @@ public static class ModComp
                     System.Windows.Application.Current.Dispatcher.BeginInvoke(new Func<Task>(async () =>
                     {
                         if (ModMain.MyMsgBox(
-                                "PCL detected a resource link in clipboard. Do you want to jump to the details page?",
-                                "Link Detected", "Confirm", "Cancel", forceWait: true) == 1)
+                                Lang.Text("Download.Comp.Detail.Clipboard.Detected.Message"),
+                                Lang.Text("Download.Comp.Detail.Clipboard.Detected.Title"),
+                                Lang.Text("Common.Action.Confirm"), Lang.Text("Common.Action.Cancel"),
+                                forceWait: true) == 1)
                         {
-                            HintService.Hint("Fetching resource info...");
+                            HintService.Hint(Lang.Text("Download.Comp.Detail.Clipboard.Fetching"));
 
                             var ids = new List<string> { projectId };
                             var compProjects = await CompRequest.GetCompProjectsByIdsAsync(ids);
 
                             if (compProjects.Count == 0)
                             {
-                                HintService.Hint("Invalid resource content.", HintType.Error);
+                                HintService.Hint(Lang.Text("Download.Comp.Detail.Clipboard.InvalidContent"),
+                                    HintType.Error);
                                 return;
                             }
 
@@ -804,7 +807,11 @@ public static class ModComp
         }
         catch (Exception ex)
         {
-            ModBase.Log(ex, "获取模组翻译信息失败", ModBase.LogLevel.Hint);
+            ModBase.Log(
+                ex,
+                "获取模组翻译信息失败",
+                ModBase.LogLevel.Hint,
+                userSummary: Lang.Text("Minecraft.Comp.Error.OperationFailed"));
             return null;
         }
     }
@@ -1468,11 +1475,19 @@ public static class ModComp
                     return null;
                 }
 
-                ModBase.Log(ex, "获取中文描述时出现错误", ModBase.LogLevel.Hint);
+                ModBase.Log(
+                    ex,
+                    "获取中文描述时出现错误",
+                    ModBase.LogLevel.Hint,
+                    userSummary: Lang.Text("Minecraft.Comp.Error.OperationFailed"));
             }
             catch (Exception ex)
             {
-                ModBase.Log(ex, "获取中文描述时出现错误", ModBase.LogLevel.Hint);
+                ModBase.Log(
+                    ex,
+                    "获取中文描述时出现错误",
+                    ModBase.LogLevel.Hint,
+                    userSummary: Lang.Text("Minecraft.Comp.Error.OperationFailed"));
             }
 
             return result;
@@ -2379,9 +2394,10 @@ public static class ModComp
             var searchEntries = new List<ModBase.SearchEntry<CompDatabaseEntry>>();
             using (var conn = CompDB)
             {
-                var sql =
-                    "SELECT * FROM ModTranslation WHERE ChineseName LIKE @p OR CurseForgeSlug LIKE @p OR ModrinthSlug LIKE @p";
-                var searchRes = conn.Query<CompDatabaseEntry>(sql, new { p = $"%{rawFilter}%" });
+                var likeEscaped = rawFilter.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
+                var searchRes = conn.Query<CompDatabaseEntry>(
+                    "SELECT * FROM ModTranslation WHERE ChineseName LIKE @p ESCAPE '\\' OR CurseForgeSlug LIKE @p ESCAPE '\\' OR ModrinthSlug LIKE @p ESCAPE '\\'",
+                    new { p = $"%{likeEscaped}%" }).ToList();
                 foreach (var searchItem in searchRes)
                 {
                     if (searchItem.ChineseName.Contains("动态的树")) continue;
@@ -2414,7 +2430,8 @@ public static class ModComp
                     w =>
                     {
                         if (w.Length <= 1) return false;
-                        if (new[] { "the", "of", "mod", "and" }.Contains(w)) return false;
+                        if (!w.Any(char.IsLetterOrDigit)) return false;
+                        if (new[] { "the", "of", "for", "mod", "and", "forge", "fabric", "quilt", "neoforge" }.Contains(w)) return false;
                         if (ModBase.Val(w) > 0) return false;
                         if (w.Split(' ').Length > 3 && w.Contains("ftb")) return false;
                         return true;
@@ -2422,34 +2439,66 @@ public static class ModComp
                 return words;
             }
 
-            var wordWeights = new Dictionary<string, double>();
+            var wordModCount = new Dictionary<string, HashSet<int>>();
             foreach (var result in searchResults)
-            {
                 foreach (var word in ExtractWords(result))
                 {
-                    var similarity = result.searchSource.Any(s => s.aliases.Contains(request.searchText))
-                        ? 100000
-                        : result.similarity;
-                    if (!wordWeights.ContainsKey(word))
-                        wordWeights.Add(word, 0);
-                    wordWeights[word] += similarity;
+                    if (!wordModCount.TryGetValue(word, out var mods))
+                        wordModCount[word] = mods = new HashSet<int>();
+                    mods.Add(result.item.WikiId);
                 }
-            }
 
-            if (!wordWeights.Any()) throw new Exception(Lang.Text("Download.Comp.List.NoResults"));
+            if (wordModCount.Count == 0) throw new Exception(Lang.Text("Download.Comp.List.NoResults"));
 
-            var sortedWords = wordWeights.OrderByDescending(w => w.Value).ToList();
-            if (sortedWords.First().Value >= 100000)
+            static string NormalizeName(string s) =>
+                new string(s.Where(c => !char.IsWhiteSpace(c) && !char.IsSurrogate(c)).ToArray());
+            string CanonName(string name) => NormalizeName(name.BeforeFirst(" ("));
+            var normalizedQuery = NormalizeName(rawFilter);
+            var exactNameEntries = searchResults
+                .Where(r => CanonName(r.item.ChineseName) == normalizedQuery).ToList();
+            var exactNameMods = exactNameEntries.Select(r => r.item.WikiId).Distinct().Count();
+
+            if (exactNameMods == 1)
             {
-                request.searchText = string.Join(" ", sortedWords.Where(w => w.Value >= 100000).Select(w => w.Key));
+                var canonicalEntry = exactNameEntries
+                    .OrderByDescending(r => r.absoluteRight)
+                    .ThenByDescending(r => r.similarity)
+                    .ThenBy(r => (r.item.CurseForgeSlug ?? r.item.ModrinthSlug ?? r.item.ChineseName).Length)
+                    .First();
+                var canonicalWords = ExtractWords(canonicalEntry);
+                request.searchText = canonicalWords.Any()
+                    ? string.Join(" ", canonicalWords)
+                    : string.Join(" ", wordModCount.OrderByDescending(w => w.Value.Count).Take(2).Select(w => w.Key));
+                var cfSlugs = exactNameEntries.Select(r => r.item.CurseForgeSlug)
+                    .Where(s => s is not null).Distinct().ToList();
+                if (cfSlugs.Count == 1)
+                    request.curseForgeAltSearchText = cfSlugs[0];
             }
             else
             {
-                request.searchText = string.Join(" ", sortedWords.Take(5).Select(w => w.Key));
-                request.curseForgeAltSearchText = string.Join(" ", ExtractWords(searchResults.First()));
-                LogWrapper.Debug("[Comp] 中文搜索基础关键词（CurseForge）：" + request.curseForgeAltSearchText);
+                var maxCount = wordModCount.Values.Max(mods => mods.Count);
+                if (maxCount <= 1)
+                {
+                    var best = searchResults
+                        .OrderByDescending(r => r.absoluteRight)
+                        .ThenByDescending(r => r.similarity)
+                        .ThenBy(r => (r.item.CurseForgeSlug ?? r.item.ModrinthSlug ?? r.item.ChineseName).Length)
+                        .First();
+                    request.searchText = string.Join(" ", ExtractWords(best));
+                }
+                else
+                {
+                    var tied = wordModCount
+                        .Where(w => w.Value.Count == maxCount)
+                        .OrderBy(w => w.Key.Length)
+                        .ToList();
+                    var anchorMods = tied[0].Value;
+                    request.searchText = string.Join(" ", tied
+                        .Where(w => w.Value.Overlaps(anchorMods))
+                        .Take(3)
+                        .Select(w => w.Key));
+                }
             }
-
             LogWrapper.Debug("[Comp] 中文搜索基础关键词：" + request.searchText);
         }
 
@@ -2702,11 +2751,11 @@ public static class ModComp
         //  <summary>
         //  未经处理的支持的游戏版本列表。
         // </summary>
-        public readonly List<string> RawGameVersions;
+        public readonly List<string> RawGameVersions = new();
         /// <summary>
         ///     支持的游戏版本列表。类型包括："26.1.5"，"26.1"，"26.1 预览版"，"1.18.5"，"1.18"，"1.18 预览版"，"21w15a"，"未知版本"。
         /// </summary>
-        public readonly List<string> GameVersions;
+        public readonly List<string> GameVersions = new();
 
         /// <summary>
         ///     文件的 SHA1 或 MD5。
@@ -2721,7 +2770,7 @@ public static class ModComp
         /// <summary>
         ///     支持的 Mod 加载器列表。可能为空。
         /// </summary>
-        public readonly List<CompLoaderType> ModLoaders;
+        public readonly List<CompLoaderType> ModLoaders = new();
 
         /// <summary>
         ///     该文件的所有可选依赖工程的 Project.Id。
@@ -3427,7 +3476,11 @@ public static class ModComp
             }
             catch (Exception ex)
             {
-                ModBase.Log(ex, "[Comp] 快速下载失败", ModBase.LogLevel.Feedback);
+                ModBase.Log(
+                    ex,
+                    "[Comp] 快速下载失败",
+                    ModBase.LogLevel.Feedback,
+                    userSummary: Lang.Text("Minecraft.Comp.Error.OperationFailed"));
             }
         }, "Comp QuickDownload");
     }
