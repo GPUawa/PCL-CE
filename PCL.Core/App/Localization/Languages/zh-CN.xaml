@@ -1579,8 +1579,8 @@
     <sys:String x:Key="Launch.Account.Profile.Validation.QuoteInUsername">玩家名不能包含英文引号！</sys:String>
     <sys:String x:Key="Launch.Account.Profile.Validation.UnknownAuthType">未知的验证方式</sys:String>
     <sys:String x:Key="Launch.Account.Profile.Validation.UsernameTooLong">自 1.20.3 起，玩家名至多只能包含 16 个字符！</sys:String>
-    <sys:String x:Key="Launch.Account.Profile.NonMicrosoft.Title">非正版档案</sys:String>
-    <sys:String x:Key="Launch.Account.Profile.NonMicrosoft.Message">看起来这是一个非正版档案欸...&#xA;如果还没有购入正版的话，那也别忘了以后补票哦~</sys:String>
+    <sys:String x:Key="Launch.Account.Profile.NonMicrosoft.Title">创建非正版档案</sys:String>
+    <sys:String x:Key="Launch.Account.Profile.NonMicrosoft.Message">似乎正在创建一个非正版档案欸...&#xA;如果还没有购入正版的话，那也别忘了以后补票哦~</sys:String>
 
 
     <!-- Launch.Account.Profile.EditPlayerId -->
