@@ -352,9 +352,33 @@ public static class ModProfile
         if (selectedAuthTypeNum.HasValue && selectedAuthTypeNum.Value == 0) // 正版验证
             ModBase.RunInUi(() => ModMain.frmLaunchLeft.RefreshPage(true, ModLaunch.McLoginType.Ms));
         else if (selectedAuthTypeNum.HasValue && selectedAuthTypeNum.Value == 1) // 第三方验证
-            ModBase.RunInUi(() => ModMain.frmLaunchLeft.RefreshPage(true, ModLaunch.McLoginType.Auth));
+        {
+            var confirm = ModMain.MyMsgBox(
+                Lang.Text("Launch.Account.Profile.NonMicrosoft.Message"),
+                Lang.Text("Launch.Account.Profile.NonMicrosoft.Title"),
+                Lang.Text("Common.Action.Continue"),
+                Lang.Text("Common.Action.Cancel"),
+                forceWait: true
+            );
+            if (confirm == 1)
+            {
+                ModBase.RunInUi(() => ModMain.frmLaunchLeft.RefreshPage(true, ModLaunch.McLoginType.Auth));
+            }
+        }
         else // 离线验证
-            ModBase.RunInUi(() => ModMain.frmLaunchLeft.RefreshPage(true, ModLaunch.McLoginType.Legacy));
+        {
+            var confirm = ModMain.MyMsgBox(
+                Lang.Text("Launch.Account.Profile.NonMicrosoft.Message"),
+                Lang.Text("Launch.Account.Profile.NonMicrosoft.Title"),
+                Lang.Text("Common.Action.Continue"),
+                Lang.Text("Common.Action.Cancel"),
+                forceWait: true
+            );
+            if (confirm == 1)
+            {
+                ModBase.RunInUi(() => ModMain.frmLaunchLeft.RefreshPage(true, ModLaunch.McLoginType.Legacy));
+            }
+        }
     }
 
     private static List<IMyRadio> _GetAvailableProfileSelection => new List<IMyRadio>
