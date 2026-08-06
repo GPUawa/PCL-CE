@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Net.Http;
 using System.Security.Cryptography;
@@ -342,43 +342,35 @@ public static class ModProfile
         int? selectedAuthTypeNum = default; // 验证类型序号
         ModBase.RunInUiWait(() =>
         {
-            List<IMyRadio> authTypeList;
-            authTypeList = _GetAvailableProfileSelection;
+            var authTypeList = _GetAvailableProfileSelection;
             selectedAuthTypeNum = ModMain.MyMsgBoxSelect(authTypeList, Lang.Text("Launch.Account.Profile.Create.SelectAuthType.Title"), Lang.Text("Common.Action.Continue"), Lang.Text("Common.Action.Cancel"));
         });
         if (selectedAuthTypeNum is null)
             return;
+
         isCreatingProfile = true;
-        if (selectedAuthTypeNum.HasValue && selectedAuthTypeNum.Value == 0) // 正版验证
+
+        if (selectedAuthTypeNum.Value == 0) // 正版验证
+        {
             ModBase.RunInUi(() => ModMain.frmLaunchLeft.RefreshPage(true, ModLaunch.McLoginType.Ms));
-        else if (selectedAuthTypeNum.HasValue && selectedAuthTypeNum.Value == 1) // 第三方验证
-        {
-            var confirm = ModMain.MyMsgBox(
-                Lang.Text("Launch.Account.Profile.NonMicrosoft.Message"),
-                Lang.Text("Launch.Account.Profile.NonMicrosoft.Title"),
-                Lang.Text("Common.Action.Continue"),
-                Lang.Text("Common.Action.Cancel"),
-                forceWait: true
-            );
-            if (confirm == 1)
-            {
-                ModBase.RunInUi(() => ModMain.frmLaunchLeft.RefreshPage(true, ModLaunch.McLoginType.Auth));
-            }
+            return;
         }
-        else // 离线验证
+
+        // 第三方与离线验证
+        var confirm = ModMain.MyMsgBox(
+            Lang.Text("Launch.Account.Profile.NonMicrosoft.Message"),
+            Lang.Text("Launch.Account.Profile.NonMicrosoft.Title"),
+            Lang.Text("Common.Action.Continue"),
+            Lang.Text("Common.Action.Cancel"),
+            forceWait: true
+        );
+        if (confirm != 1)
         {
-            var confirm = ModMain.MyMsgBox(
-                Lang.Text("Launch.Account.Profile.NonMicrosoft.Message"),
-                Lang.Text("Launch.Account.Profile.NonMicrosoft.Title"),
-                Lang.Text("Common.Action.Continue"),
-                Lang.Text("Common.Action.Cancel"),
-                forceWait: true
-            );
-            if (confirm == 1)
-            {
-                ModBase.RunInUi(() => ModMain.frmLaunchLeft.RefreshPage(true, ModLaunch.McLoginType.Legacy));
-            }
+            return;
         }
+
+        var targetType = selectedAuthTypeNum.Value == 1 ? ModLaunch.McLoginType.Auth : ModLaunch.McLoginType.Legacy;
+        ModBase.RunInUi(() => ModMain.frmLaunchLeft.RefreshPage(true, targetType));
     }
 
     private static List<IMyRadio> _GetAvailableProfileSelection => new List<IMyRadio>
