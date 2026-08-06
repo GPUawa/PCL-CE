@@ -343,19 +343,7 @@ public static class ModProfile
         ModBase.RunInUiWait(() =>
         {
             List<IMyRadio> authTypeList;
-#if DEBUG || DEBUGCI
-            authTypeList = _GetAvailableProfileSelection(true);
-#else
-            var hasMinecraftAccount = profileList.Any(x => x.Type == ModLaunch.McLoginType.Ms);
-            var restricted = Lang.IsFeaturesUnrestricted && profileList.Count > 0;
-            var hasNetwork = NetworkHelper.IsNetworkAvailable();
-            if (hasMinecraftAccount || restricted || !hasNetwork)
-                authTypeList = _GetAvailableProfileSelection(true);
-            else
-                authTypeList = _GetAvailableProfileSelection(false);
-            
-#endif
-        
+            authTypeList = _GetAvailableProfileSelection;
             selectedAuthTypeNum = ModMain.MyMsgBoxSelect(authTypeList, Lang.Text("Launch.Account.Profile.Create.SelectAuthType.Title"), Lang.Text("Common.Action.Continue"), Lang.Text("Common.Action.Cancel"));
         });
         if (selectedAuthTypeNum is null)
@@ -369,40 +357,26 @@ public static class ModProfile
             ModBase.RunInUi(() => ModMain.frmLaunchLeft.RefreshPage(true, ModLaunch.McLoginType.Legacy));
     }
 
-    private static List<IMyRadio> _GetAvailableProfileSelection(bool includeOfflineAndThirdParty) => includeOfflineAndThirdParty switch
+    private static List<IMyRadio> _GetAvailableProfileSelection => new List<IMyRadio>
     {
-        true =>
-        [
-            new MyListItem
-            {
-                Title = Lang.Text("Launch.Account.Type.Microsoft"),
-                Type = MyListItem.CheckType.RadioBox,
-                SvgIcon = "lucide/shield-check"
-            },
-
-            new MyListItem
-            {
-                Title = Lang.Text("Launch.Account.Type.ThirdParty"),
-                Type = MyListItem.CheckType.RadioBox,
-                SvgIcon = "lucide/network"
-            },
-
-            new MyListItem
-            {
-                Title = Lang.Text("Launch.Account.Type.Offline"),
-                Type = MyListItem.CheckType.RadioBox,
-                SvgIcon = "lucide/link-2-off"
-            }
-        ],
-        _ =>
-        [
-            new MyListItem
-            {
-                Title = Lang.Text("Launch.Account.Type.Microsoft"),
-                Type = MyListItem.CheckType.RadioBox,
-                SvgIcon = "lucide/shield-check"
-            }
-        ]
+        new MyListItem
+        {
+            Title = Lang.Text("Launch.Account.Type.Microsoft"),
+            Type = MyListItem.CheckType.RadioBox,
+            SvgIcon = "lucide/shield-check"
+        },
+        new MyListItem
+        {
+            Title = Lang.Text("Launch.Account.Type.ThirdParty"),
+            Type = MyListItem.CheckType.RadioBox,
+            SvgIcon = "lucide/network"
+        },
+        new MyListItem
+        {
+            Title = Lang.Text("Launch.Account.Type.Offline"),
+            Type = MyListItem.CheckType.RadioBox,
+            SvgIcon = "lucide/link-2-off"
+        }
     };
             
 
