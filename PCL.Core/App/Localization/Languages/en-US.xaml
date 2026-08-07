@@ -1579,6 +1579,8 @@
     <sys:String x:Key="Launch.Account.Profile.Validation.QuoteInUsername">Username cannot contain quotation marks!</sys:String>
     <sys:String x:Key="Launch.Account.Profile.Validation.UnknownAuthType">Unknown login type.</sys:String>
     <sys:String x:Key="Launch.Account.Profile.Validation.UsernameTooLong">Starting from version 1.20.3, usernames can contain a maximum of 16 characters!</sys:String>
+    <sys:String x:Key="Launch.Account.Profile.NonMicrosoft.Title">Create Non-Microsoft Profile</sys:String>
+    <sys:String x:Key="Launch.Account.Profile.NonMicrosoft.Message">You're about to create a non-Microsoft profile...&#xA;If you haven't purchased the game yet, remember to buy it later!</sys:String>
 
     <!-- Launch.Account.Profile.EditPlayerId -->
 
