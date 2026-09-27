@@ -229,25 +229,6 @@
                         </local:MyCheckBox>
                         <StackPanel Margin="30,0,0,0" x:Name="PanOptionsOtherFolders"
                                     Visibility="{Binding Checked, ElementName=CheckOptionsOtherFolders, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                        <local:MyCheckBox x:Name="CheckOptionsPcl">
-                            <local:MyCheckBox.Tag>
-                                <local:ExportOption
-                                    Title="{DynamicResource Instance.Export.Option.Launcher}"
-                                    Description="{DynamicResource Instance.Export.Option.Launcher.Desc}"
-                                    DefaultChecked="False" />
-                            </local:MyCheckBox.Tag>
-                        </local:MyCheckBox>
-                        <StackPanel Margin="30,0,0,0"
-                                    Visibility="{Binding Checked, ElementName=CheckOptionsPcl, Converter={StaticResource BooleanToVisibilityConverter}}">
-                            <local:MyCheckBox x:Name="CheckOptionsPclCustom">
-                                <local:MyCheckBox.Tag>
-                                    <local:ExportOption
-                                        Title="{DynamicResource Instance.Export.Option.LauncherCustom}"
-                                        Description="{DynamicResource Instance.Export.Option.LauncherCustom.Desc}"
-                                        DefaultChecked="True" />
-                                </local:MyCheckBox.Tag>
-                            </local:MyCheckBox>
-                        </StackPanel>
                     </StackPanel>
                 </local:MyCard>
                 <local:MyCard Title="{DynamicResource Instance.Export.Advanced.Title}" Margin="0,0,0,15" CanSwap="True"

@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.IO.Compression;
 using System.Windows;
 using System.Windows.Controls;
@@ -110,9 +110,6 @@ public partial class PageInstanceExport : IRefreshable
     // 勾选 Modrinth 上传模式时，禁止打包 PCL
     private void CheckAdvancedModrinth_Change(object sender, bool user)
     {
-        if (CheckAdvancedModrinth.Checked == true)
-            CheckOptionsPcl.Checked = false;
-        CheckOptionsPcl.IsEnabled = (bool)!CheckAdvancedModrinth.Checked;
     }
 
     // 勾选"其他文件夹"时，同步勾选/取消所有子选项
@@ -599,11 +596,6 @@ public partial class PageInstanceExport : IRefreshable
             configLines.Add("Name:" + TextExportName.Text);
             configLines.Add("Version:" + TextExportVersion.Text);
             configLines.Add("");
-            configLines.Add("# " + Lang.Text("Instance.Export.Config.Comment.IncludeLauncher"));
-            configLines.Add("IncludeLauncher:" + CheckOptionsPcl.Checked);
-            configLines.Add("");
-            configLines.Add("# " + Lang.Text("Instance.Export.Config.Comment.IncludeLauncherCustom"));
-            configLines.Add("IncludeLauncherCustom:" + CheckOptionsPclCustom.Checked);
             configLines.Add("");
             configLines.Add("# " + Lang.Text("Instance.Export.Config.Comment.BundleFiles"));
             configLines.Add("# " + Lang.Text("Instance.Export.Config.Comment.BundleFiles2"));
@@ -678,10 +670,6 @@ public partial class PageInstanceExport : IRefreshable
             // 赋值到界面控件
             TextExportName.Text = ini.GetOrDefault("Name", "");
             TextExportVersion.Text = ini.GetOrDefault("Version", "");
-            CheckOptionsPcl.Checked =
-                Convert.ToBoolean(ini.GetOrDefault("IncludeLauncher", false.ToString()));
-            CheckOptionsPclCustom.Checked =
-                Convert.ToBoolean(ini.GetOrDefault("IncludeLauncherCustom", true.ToString()));
             CheckAdvancedModrinth.Checked =
                 Convert.ToBoolean(ini.GetOrDefault("ModrinthUploadMode", false.ToString()));
             CheckAdvancedInclude.Checked =
@@ -839,8 +827,6 @@ public partial class PageInstanceExport : IRefreshable
             var extensions = new List<string>();
             if (CheckAdvancedModrinth.Checked == false)
                 extensions.Add(Lang.Text("Instance.Export.ZipFilter"));
-            if (CheckOptionsPcl.Checked == false)
-                extensions.Add(Lang.Text("Instance.Export.MrpackFilter"));
             packPath = SystemDialogs.SelectSaveFile(Lang.Text("Instance.Export.SelectSaveLocation"),
                 packName + (string.IsNullOrEmpty(TextExportVersion.Text) ? "" : " " + TextExportVersion.Text),
                 extensions.Join("|"));
@@ -857,33 +843,12 @@ public partial class PageInstanceExport : IRefreshable
         var pathIndie = mcInstance.PathIndie;
         var checkHostedAssets = (bool)!CheckAdvancedInclude.Checked;
         var modrinthUploadMode = (bool)CheckAdvancedModrinth.Checked;
-        var includePCL = (bool)CheckOptionsPcl.Checked;
-        var includePCLCustom = (bool)(includePCL ? CheckOptionsPclCustom.Checked : (bool?)false);
         var allRules = StandardizeLines(GetAllRules(), true).ToList();
         var allExtraFiles = StandardizeLines(GetExtraFileLines(), false).ToList();
         ModBase.Log($"[Export] 准备导出整合包，共有 {allRules.Count} 条规则，{allExtraFiles.Count} 条追加内容行");
 
         // 构造步骤加载器
         var loaders = new List<ModLoader.LoaderBase>();
-
-        #region 准备 PCL 文件
-        
-        #if !RELEASE
-        if (includePCL)
-            loaders.Add(new ModLoader.LoaderTask<int, int>(Lang.Text("Instance.Export.Task.DownloadPclRelease"),
-                loader =>
-                {
-                    UpdateManager.DownloadLatestPCL(loader);
-                    ModBase.CopyFile(Path.Combine(ModBase.pathTemp, "CE-Latest.exe"),
-                        Path.Combine(cacheFolder, "Plain Craft Launcher.exe"));
-                })
-            {
-                ProgressWeight = 0.5d,
-                block = false
-            });
-        #endif
-
-        #endregion
 
         #region 复制文件
 
@@ -950,7 +915,7 @@ public partial class PageInstanceExport : IRefreshable
             ModBase.Log($"[Export] 复制 overrides 文件完成，有 {loader.output.Count} 个文件需要联网检查");
             loader.Progress = 0.95d;
             // 复制追加内容到根目录
-            var baseFolder = includePCL ? cacheFolder : Path.Combine(cacheFolder, "modpack");
+            var baseFolder = Path.Combine(cacheFolder, "modpack");
             foreach (var Line in allExtraFiles)
                 if (Line.EndsWithF(@"\") || Line.EndsWithF("/"))
                 {
@@ -971,26 +936,6 @@ public partial class PageInstanceExport : IRefreshable
             loader.Progress = 0.97d;
             // 复制 PCL 实例设置
             ModBase.CopyDirectory(Path.Combine(mcInstance.PathInstance, "PCL"), Path.Combine(overridesFolder, "PCL"));
-            #if RELEASE
-                        // 复制 PCL 本体
-                        if (includePCL) ModBase.CopyFile(Basics.ExecutablePath, Path.Combine(cacheFolder, Basics.ExecutableName));
-            #endif
-            // 复制 PCL 个性化内容
-            if (includePCLCustom)
-            {
-                if (Directory.Exists(Path.Combine(ModBase.exePath, "PCL", "Pictures")))
-                    ModBase.CopyDirectory(Path.Combine(ModBase.exePath, "PCL", "Pictures"), Path.Combine(cacheFolder, "PCL", "Pictures"));
-                if (Directory.Exists(Path.Combine(ModBase.exePath, "PCL", "Musics")))
-                    ModBase.CopyDirectory(Path.Combine(ModBase.exePath, "PCL", "Musics"), Path.Combine(cacheFolder, "PCL", "Musics"));
-                if (File.Exists(Path.Combine(ModBase.exePath, "PCL", "Custom.xaml")))
-                    ModBase.CopyFile(Path.Combine(ModBase.exePath, "PCL", "Custom.xaml"), Path.Combine(cacheFolder, "PCL", "Custom.xaml"));
-                if (File.Exists(Path.Combine(ModBase.exePath, "PCL", "Setup.ini")))
-                    ModBase.CopyFile(Path.Combine(ModBase.exePath, "PCL", "Setup.ini"), Path.Combine(cacheFolder, "PCL", "Setup.ini"));
-                if (File.Exists(Path.Combine(ModBase.exePath, "PCL", "hints.txt")))
-                    ModBase.CopyFile(Path.Combine(ModBase.exePath, "PCL", "hints.txt"), Path.Combine(cacheFolder, "PCL", "hints.txt"));
-                if (File.Exists(Path.Combine(ModBase.exePath, "PCL", "Logo.png")))
-                    ModBase.CopyFile(Path.Combine(ModBase.exePath, "PCL", "Logo.png"), Path.Combine(cacheFolder, "PCL", "Logo.png"));
-            }
         })
         {
             ProgressWeight = 5d
@@ -1177,23 +1122,9 @@ public partial class PageInstanceExport : IRefreshable
                 Directory.CreateDirectory(ModBase.GetPathFromFullPath(packPath));
                 if (File.Exists(packPath))
                     File.Delete(packPath);
-                if (includePCL)
-                {
-                    // 首次压缩整合包
-                    ZipFile.CreateFromDirectory(Path.Combine(cacheFolder, "modpack"), Path.Combine(cacheFolder, "modpack.mrpack"));
-                    loader.Progress = 0.5d;
-                    Directory.Delete(Path.Combine(cacheFolder, "modpack"), true);
-                    loader.Progress = 0.6d;
-                    // 二次压缩整合包
-                    ZipFile.CreateFromDirectory(cacheFolder, packPath);
-                    loader.Progress = 0.9d;
-                }
-                else
-                {
-                    // 直接压缩整合包
-                    ZipFile.CreateFromDirectory(Path.Combine(cacheFolder, "modpack"), packPath);
-                    loader.Progress = 0.8d;
-                }
+                // 直接压缩整合包
+                ZipFile.CreateFromDirectory(Path.Combine(cacheFolder, "modpack"), packPath);
+                loader.Progress = 0.8d;
 
                 Directory.Delete(cacheFolder, true);
                 ModBase.OpenExplorer(packPath);

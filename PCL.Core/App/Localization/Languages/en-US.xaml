@@ -1853,8 +1853,6 @@
     <sys:String x:Key="Main.Extra.GiveUp.ToolTip">Surrender</sys:String>
     <sys:String x:Key="Main.Extra.ShutdownMinecraft.ToolTip">Close Minecraft</sys:String>
     <sys:String x:Key="Main.Extra.TaskManager.ToolTip">Task manager</sys:String>
-    <sys:String x:Key="Main.Extra.UpdateRestart.ToolTip">Restart PCL CE to apply software updates</sys:String>
-    <sys:String x:Key="Main.Extra.UpdateRestart.ToolTipWithVersion">Restart PCL CE to apply software updates ({0} → {1})</sys:String>
     <sys:String x:Key="Main.HiddenFeature.Disabled">The feature hiding setting has been temporarily disabled!</sys:String>
     <sys:String x:Key="Main.HiddenFeature.Enabled">The feature hiding setting has been re-enabled!</sys:String>
     <sys:String x:Key="Main.ShutdownMinecraft.Success">Minecraft instance closed!</sys:String>
@@ -2861,7 +2859,6 @@
     <sys:String x:Key="Setup.Left.Item.Log">Logs</sys:String>
     <sys:String x:Key="Setup.Left.Item.Misc">Miscellaneous</sys:String>
     <sys:String x:Key="Setup.Left.Item.Ui">Personalization</sys:String>
-    <sys:String x:Key="Setup.Left.Item.Update">Updates</sys:String>
 
     <!-- Setup.Log -->
 
@@ -3074,7 +3071,6 @@
     <sys:String x:Key="Setup.Ui.FeatureHide.Item.Toolbox">Toolbox</sys:String>
     <sys:String x:Key="Setup.Ui.FeatureHide.Item.Tools">Tools</sys:String>
     <sys:String x:Key="Setup.Ui.FeatureHide.Item.Ui">Personalization</sys:String>
-    <sys:String x:Key="Setup.Ui.FeatureHide.Item.Update">Update</sys:String>
 
     <!-- Setup.Ui.Homepage -->
 
@@ -3165,61 +3161,15 @@
 
     <!-- Setup.Update -->
 
-    <sys:String x:Key="Setup.Update.Changelog.Empty">The developers seem to have forgotten to provide an update summary... Maybe click below to view the full changelog?</sys:String>
-    <sys:String x:Key="Setup.Update.Changelog.MoreInfo">More information about this update...</sys:String>
-    <sys:String x:Key="Setup.Update.Changelog.Placeholder">PCL CE 2.14.0 brings a refreshing new design, several Pigeon smart features, and a delightful cross-instance workflow to boost your productivity.</sys:String>
-    <sys:String x:Key="Setup.Update.Changelog.Title">About this update</sys:String>
-    <sys:String x:Key="Setup.Update.Changelog.Unavailable">No changelog available...</sys:String>
-    <sys:String x:Key="Setup.Update.Changelog.View">Full changelog</sys:String>
-    <sys:String x:Key="Setup.Update.CheckAgain">Check again</sys:String>
-    <sys:String x:Key="Setup.Update.CheckFailed">Failed to check for updates</sys:String>
-    <sys:String x:Key="Setup.Update.Checking">Checking for updates...</sys:String>
-    <sys:String x:Key="Setup.Update.DotNetMissing.DownloadRuntime">Download .NET 10 Runtime</sys:String>
-    <sys:String x:Key="Setup.Update.DotNetMissing.Message">A launcher update (version {0}) was found, but the new version requires .NET 10 to be installed on your computer.&#xA;You need to install .NET 10 before continuing the update.&#xA;&#xA;Click the button below to open the webpage, then select {1} under ".NET Desktop Runtime" to download.</sys:String>
-    <sys:String x:Key="Setup.Update.DotNetMissing.Title">Launcher update - missing runtime</sys:String>
-    <sys:String x:Key="Setup.Update.Error.NetworkFailed">Unable to retrieve latest version information. Please check your network connection.</sys:String>
-    <sys:String x:Key="Setup.Update.Install">Download and install</sys:String>
-    <sys:String x:Key="Setup.Update.Latest">Already up to date</sys:String>
-    <sys:String x:Key="Setup.Update.MirrorChyanCdk.Get">Get CDK</sys:String>
-    <sys:String x:Key="Setup.Update.MirrorChyanCdk.Label">MirrorChyan CDK</sys:String>
-    <sys:String x:Key="Setup.Update.MirrorChyanCdk.ToolTip">MirrorChyan (mirrorchyan.com) is a paid third-party application distribution platform that provides high-speed download sources in China.&#xA;This is an optional service. Leaving the CDK blank does not affect normal use or updates.&#xA;If you have a MirrorChyan CDK, you can provide it to PCL CE, and the launcher will prioritize its high-speed download source for software updates. This can also help reduce pressure on the community update server...</sys:String>
-    <sys:String x:Key="Setup.Update.OtherOptions.Placeholder">AquaCL 3 is the first major update of PCL CE. It brings a refreshing new design, uses the latest development technologies, completely rebuilds the core experience, and adds support for macOS, Linux, and other platforms.</sys:String>
-    <sys:String x:Key="Setup.Update.OtherOptions.Title">Other update options - upgrade to AquaCL</sys:String>
-    <sys:String x:Key="Setup.Update.RestartInstall">Restart to install</sys:String>
 
     <!-- Setup.Update.Auto -->
 
-    <sys:String x:Key="Setup.Update.Auto.Disabled">Do not automatically check for updates (not recommended)</sys:String>
-    <sys:String x:Key="Setup.Update.Auto.Disabled.ToolTip">Disable automatic update checking. This may prevent you from receiving updates in a timely manner.</sys:String>
-    <sys:String x:Key="Setup.Update.Auto.DownloadAndInstall">Automatically download and install updates</sys:String>
-    <sys:String x:Key="Setup.Update.Auto.DownloadAndInstall.ToolTip">The launcher will automatically check for and download available updates, and install them after closing.</sys:String>
-    <sys:String x:Key="Setup.Update.Auto.DownloadAndNotify">Automatically download and prompt for update</sys:String>
-    <sys:String x:Key="Setup.Update.Auto.DownloadAndNotify.ToolTip">The launcher will automatically check for and download available updates, then prompt you to install.</sys:String>
-    <sys:String x:Key="Setup.Update.Auto.NotifyOnly">Prompt for update</sys:String>
-    <sys:String x:Key="Setup.Update.Auto.NotifyOnly.ToolTip">The launcher will automatically check for available updates, then prompt you to download and install.</sys:String>
-    <sys:String x:Key="Setup.Update.Auto.Title">Auto update settings</sys:String>
 
     <!-- Setup.Update.Channel -->
 
-    <sys:String x:Key="Setup.Update.Channel.Beta">Beta</sys:String>
-    <sys:String x:Key="Setup.Update.Channel.Beta.ToolTip">Potentially unstable beta versions for early feature testing. Suitable for users who want to help test and have some technical ability.</sys:String>
-    <sys:String x:Key="Setup.Update.Channel.Beta.Warning.Message">You are switching the launcher update channel to Beta.&#xA;Beta versions provide previews of upcoming updates, but may include insufficiently tested features and have reduced stability.&#xA;&#xA;After upgrading to Beta, you will need to wait for the next Release version or manually re-download the launcher to switch back to Release.&#xA;This option is only recommended for users with some basic knowledge and ability. If you are creating a modpack, please use the Release version!</sys:String>
-    <sys:String x:Key="Setup.Update.Channel.Common.Warning.Confirm">I understand</sys:String>
-    <sys:String x:Key="Setup.Update.Channel.Common.Warning.Title">Before continuing...</sys:String>
-    <sys:String x:Key="Setup.Update.Channel.Release">Release</sys:String>
-    <sys:String x:Key="Setup.Update.Channel.Release.ToolTip">A relatively stable version that only receives bug fixes and some built-in resource updates. Suitable for most users.</sys:String>
-    <sys:String x:Key="Setup.Update.Channel.Title">Update channel</sys:String>
 
     <!-- Setup.Update.Channel.Dev -->
 
-    <sys:String x:Key="Setup.Update.Channel.Dev">Dev</sys:String>
-    <sys:String x:Key="Setup.Update.Channel.Dev.FinalConfirm.ExpectedInput">I confirm switching to this branch and am aware of the risks</sys:String>
-    <sys:String x:Key="Setup.Update.Channel.Dev.FinalConfirm.Message">Are you sure you want to switch to the Dev channel?&#xA;Dev versions may have serious issues or even fail to launch!&#xA;&#xA;After upgrading to Dev, you will not be able to switch back to any other update channel without manually re-downloading the launcher.&#xA;&#xA;This option is only recommended for advanced users. If you are creating a modpack, please use the Release version!&#xA;Please enter "{0}" to confirm.</sys:String>
-    <sys:String x:Key="Setup.Update.Channel.Dev.FinalConfirm.Submit">Submit</sys:String>
-    <sys:String x:Key="Setup.Update.Channel.Dev.FinalConfirm.Title">Final confirmation</sys:String>
-    <sys:String x:Key="Setup.Update.Channel.Dev.FinalConfirm.WrongInput">The content you entered is incorrect...</sys:String>
-    <sys:String x:Key="Setup.Update.Channel.Dev.ToolTip">Potentially highly unstable development versions built directly from the latest source code. Suitable for highly technical users.&#xA;Good internet connectivity may be required to download updates from this channel.</sys:String>
-    <sys:String x:Key="Setup.Update.Channel.Dev.Warning.Message">You are switching the launcher update channel to Dev.&#xA;This channel provides early access to development builds from the latest code, but may be extremely unstable or even fail to launch.&#xA;&#xA;After upgrading to Dev, you can only manually re-download the launcher to switch back to Release or Beta.&#xA;This option is only recommended for advanced users. If you are creating a modpack, please use the Release version!</sys:String>
 
     <!-- Speed -->
 
@@ -3508,38 +3458,9 @@
 
     <!-- Update -->
 
-    <sys:String x:Key="Update.Action">Update</sys:String>
-    <sys:String x:Key="Update.Available">A new launcher version is available ({0} -&gt; {1})&#xA;Update now?</sys:String>
-    <sys:String x:Key="Update.Check.Failed">Unable to get latest version information. Please check your network connection.</sys:String>
-    <sys:String x:Key="Update.CommunityNotice.Body">You are using PCL CE from PCL-Community. Please DO NOT report issues to the original repository!&#xA;PCL-Community and its members are not affiliated with LTCat (龙腾猫跃), and do not guarantee your usage.&#xA;&#xA;If you downloaded PCL CE by mistake, we recommend using the original PCL instead.&#xA;If you downloaded PCL CE by mistake, we recommend using the original PCL instead.&#xA;If you downloaded PCL CE by mistake, we recommend using the original PCL instead.&#xA;&#xA;Differences from the original version:&#xA;- Themes: only some fixed blue themes; no plans to add new themes.&#xA;- Toolbox: some content from the original version is missing (Echo Cave, Don't Click).&#xA;&#xA;This message will be shown once after a launcher update.</sys:String>
-    <sys:String x:Key="Update.CommunityNotice.Confirm">I understand</sys:String>
-    <sys:String x:Key="Update.CommunityNotice.Title">PCL CE notice</sys:String>
-    <sys:String x:Key="Update.Error.FetchFailed">Failed to get launcher update. Please check your network connection.</sys:String>
-    <sys:String x:Key="Update.Error.FileNotFound">Update file not found</sys:String>
-    <sys:String x:Key="Update.Error.OperationFailed">An update operation failed. See the details below.</sys:String>
-    <sys:String x:Key="Update.Error.Sha256Mismatch">Update file SHA256 mismatch. Expected: {0}, actual: {1}</sys:String>
-    <sys:String x:Key="Update.Error.UnableToGetUpdate">Unable to get update information</sys:String>
-    <sys:String x:Key="Update.Error.UpdateBlocked">Update failed</sys:String>
-    <sys:String x:Key="Update.Error.UpdateBlockedMessage">PCL CE cannot update because it was blocked by Windows Security or does not have sufficient permissions.&#xA;Please add the PCL CE folder to the exclusion list, or manually replace the current file with {0}PCL\Plain Craft Launcher Community Edition.exe!</sys:String>
-    <sys:String x:Key="Update.Service.PclCe">PCL CE service</sys:String>
-    <sys:String x:Key="Update.Title">Launcher update</sys:String>
 
     <!-- Update.Task -->
 
-    <sys:String x:Key="Update.Task.ApplyFile">Apply file</sys:String>
-    <sys:String x:Key="Update.Task.Check">Verify update</sys:String>
-    <sys:String x:Key="Update.Task.DownloadFile">Download file</sys:String>
-    <sys:String x:Key="Update.Task.DownloadLatestStable">Download latest stable</sys:String>
-    <sys:String x:Key="Update.Task.DownloadUpdateFile">Download update file</sys:String>
-    <sys:String x:Key="Update.Task.GetAnnouncementFailed">Failed to get announcement information</sys:String>
-    <sys:String x:Key="Update.Task.GetDownloadInfo">Get download information</sys:String>
-    <sys:String x:Key="Update.Task.GetVersionInfo">Get version information</sys:String>
-    <sys:String x:Key="Update.Task.GetVersionInfoFailed">Failed to get version information</sys:String>
-    <sys:String x:Key="Update.Task.Install">Install update</sys:String>
-    <sys:String x:Key="Update.Task.Prepare">Prepare update</sys:String>
-    <sys:String x:Key="Update.Task.RefreshSettings">Refresh settings UI</sys:String>
-    <sys:String x:Key="Update.Task.RestartInstall">Restart install</sys:String>
-    <sys:String x:Key="Update.Task.ShowButton">Show button</sys:String>
 
     <!-- Watcher -->
 
